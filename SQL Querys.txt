@@ -1,0 +1,17 @@
+Abfrage Saison 2005
+
+SELECT 
+    m.TeamID,
+    m.Name AS Team,
+    ms.LigaName,
+    ms.Saison
+FROM MannschaftSpieltInLiga ms
+JOIN Mannschaft m 
+    ON ms.TeamID = m.TeamID
+WHERE ms.LigaName = 'Bundesliga'
+  AND ms.Saison = 2005
+ORDER BY m.Name;
+
+
+
+
