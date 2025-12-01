@@ -138,3 +138,9 @@ DELETE FROM Spiel;
 DELETE FROM MannschaftSpieltInLiga;
 DELETE FROM Mannschaft;
 
+
+33316
+66832
+66885
+72214
+72439
