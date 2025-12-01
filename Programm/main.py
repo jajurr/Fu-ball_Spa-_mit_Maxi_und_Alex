@@ -1,5 +1,5 @@
 from db.database import test_conenction
-from api.openliga import get_bundesliga_matches
+from api.openliga import get_bundesliga_matches, get_spiele_einer_saison
 from logic.converter import import_teams_historisch, import_mannschaft_spielt_in_liga, import_spiele_saison, import_goalgetters_saison
 from datetime import datetime
 def main():
@@ -23,6 +23,8 @@ def main():
         import_spiele_saison("bl1", saison)
         import_goalgetters_saison("bl1", saison)
     print("Fertig!")
-    
+    #spiele = get_spiele_einer_saison("bl1", 2010)
+    #print(spiele[0]["goals"])
+
 if __name__ == "__main__":
     main()

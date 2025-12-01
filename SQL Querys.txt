@@ -127,6 +127,26 @@ JOIN Mannschaft m
 Where Spieler.Name = 'Granit Xhaka'
 ORDER BY Spieler.Name, ssm.Saison;
 
+
+--Liste alle Eigentore
+SELECT
+    Spieler.Name AS Spielername,
+    s.Saison,
+    s.Spieltag,
+    mh.Name AS Heimteam,
+    mg.Name AS Gastteam,
+    Tor.MatchID,
+    Tor.Spielminute
+FROM SpielerSchiesstTor sst
+JOIN Tor ON Tor.GoalID = sst.GoalID
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+JOIN Spiel s ON s.MatchID = Tor.MatchID
+JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
+JOIN Mannschaft mh ON mh.TeamID = mss.Heimannschaft
+JOIN Mannschaft mg ON mg.TeamID = mss.Gastmannschaft
+WHERE sst.isOwnGoal = 1
+ORDER BY Tor.MatchID, s.Saison, s.Spieltag, Tor.Spielminute;
+
 --Alle Daten löschen
 DELETE FROM SpielerSchiesstTor;
 DELETE FROM SpielerSpieltInMannschaft;

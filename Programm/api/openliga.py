@@ -7,7 +7,6 @@ BASE_URL = "https://api.openligadb.de"
 def fetch(endpoint: str):
     """Generic fetch function."""
     url = BASE_URL + endpoint
-    print(url)
     with urllib.request.urlopen(url) as res:
         return json.loads(res.read().decode())
 
@@ -55,3 +54,9 @@ def get_goalgetters(liga, saison):
         return fetch(f"/getgoalgetters/{liga}/{saison}")
     except:
         return []  # Golatgetter existieren nicht
+    
+def get_einzelspiel(matchID):
+    try:
+        return fetch(f"/getmatchdata/{matchID}")
+    except:
+        return []  # Einzelspiel existieren nicht

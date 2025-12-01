@@ -1,4 +1,4 @@
-from api.openliga import get_bundesliga_teams, get_historische_saisons, get_spiele_einer_saison, get_goalgetters
+from api.openliga import get_bundesliga_teams, get_historische_saisons, get_spiele_einer_saison, get_goalgetters, get_einzelspiel
 from db.database import insert_team, insert_mannschaft_spielt_in_liga, insert_spiel, insert_mannschaft_spielt_spiel, insert_ergebnis, insert_spieler, insert_tor, insert_spieler_spielt_in_mannschaft, insert_spieler_schiesst_tor, update_spieler_name
 
 def import_teams_historisch():
@@ -75,54 +75,79 @@ def import_spiele_saison(liga, saison):
             )
 
         # -------------------- TORE IMPORTIEREN --------------------
-        for tor in spiel.get("goals", []):
+
+        goals = spiel.get("goals", [])
+
+        if not goals:
+            continue
+
+        einzelspiel = get_einzelspiel(match_id)
+
+        goals = einzelspiel.get("goals", [])
+
+        #Sortierung der Liste nach Spielminuten
+        goals = sorted(goals, key=lambda g: ((g.get("matchMinute") or 999), g["goalID"]))
+
+
+        prev_score1 = 0
+        prev_score2 = 0
+        
+        for tor in goals:
+
             goal_id = tor["goalID"]
             minute = tor.get("matchMinute")
             spieler_id = tor["goalGetterID"]
-            spieler_name = tor["goalGetterName"]
+            spieler_name = tor.get("goalGetterName")
 
-            #Spieler ohne Namen werden ignoriert
-            #if not spieler_name or spieler_name.strip() in ("", "0"):
-            #   continue
+            # Spieler ohne Namen ignorieren (API-Fehler vermeiden)
+            if not spieler_name or spieler_name.strip() in ("", "0"):
+                continue
 
-            # 1) Spieler speichern                
+            score1 = tor.get("scoreTeam1")
+            score2 = tor.get("scoreTeam2")
+
+            is_own = tor.get("isOwnGoal", False)
+
+            team_id = None
+
+            # --- Normales Tor Team 1 ---
+            if score1 == prev_score1 + 1 and score2 == prev_score2 and not is_own:
+                team_id = spiel["team1"]["teamId"]
+
+            # --- Normales Tor Team 2 ---
+            elif score2 == prev_score2 + 1 and score1 == prev_score1 and not is_own:
+                team_id = spiel["team2"]["teamId"]
+
+            # --- Eigentor von Team 1 (Team 2 bekommt Tor) ---
+            elif score2 == prev_score2 + 1 and score1 == prev_score1 and is_own:
+                team_id = spiel["team1"]["teamId"]
+
+            # --- Eigentor von Team 2 (Team 1 bekommt Tor) ---
+            elif score1 == prev_score1 + 1 and score2 == prev_score2 and is_own:
+                team_id = spiel["team2"]["teamId"]
+
+            # 6. Fallback: unplausibel → überspringen
+            else:
+                prev_score1 = score1
+                prev_score2 = score2
+                continue
+
+            # Datenbanken füllen
             insert_spieler(spieler_id, spieler_name)
-
-            # 2) Tor speichern
             insert_tor(goal_id, minute, match_id)
-
-            # 3) SpielerSchiesstTor speichern
             insert_spieler_schiesst_tor(
                 spieler_id,
                 goal_id,
-                1 if tor["isOwnGoal"] else 0,
-                1 if tor["isPenalty"] else 0,
+                1 if tor.get("isOwnGoal", False) else 0,
+                1 if tor.get("isPenalty", False) else 0,
                 1 if tor.get("isOvertime", False) else 0
             )
-
-            # 4) SpielerSpieltInMannschaft speichern
-            # team1 bedeutet Heimteam      
-
-            if "team1" in tor:
-            # normales Verhalten
-                if tor["team1"]:
-                    team_id = spiel["team1"]["teamId"]
-                else:
-                    team_id = spiel["team2"]["teamId"]
-            else:
-            # Fallback: wenn Eigentor -> gegnerisches Team
-                if tor["isOwnGoal"]:
-                # Eigentor -> Gegner bekommt das Tor
-                    if tor.get("team1", None) is False:   # eigentlich Gastteam
-                        team_id = spiel["team1"]["teamId"]
-                    else:
-                        team_id = spiel["team2"]["teamId"]
-                else:
-                    # team_id = spiel["team1"]["teamId"]
-                    continue
-
             insert_spieler_spielt_in_mannschaft(
                 spieler_id,
                 team_id,
                 saison
             )
+
+            # 7. Score nach dem Tor setzen
+            prev_score1 = score1
+            prev_score2 = score2
