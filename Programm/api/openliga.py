@@ -7,6 +7,7 @@ BASE_URL = "https://api.openligadb.de"
 def fetch(endpoint: str):
     """Generic fetch function."""
     url = BASE_URL + endpoint
+    print(url)
     with urllib.request.urlopen(url) as res:
         return json.loads(res.read().decode())
 
@@ -41,3 +42,10 @@ def get_historische_saisons(start_year=2001):
             vorhandene_saisons.append(year)
 
     return vorhandene_saisons
+
+def get_spiele_einer_saison(liga, saison):
+    """Gibt alle Spiele einer bestimmten Saison zurück."""
+    try:
+        return fetch(f"/getmatchdata/{liga}/{saison}")
+    except:
+        return []  # Spiele der Saison existieren nicht

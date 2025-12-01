@@ -12,6 +12,27 @@ WHERE ms.LigaName = 'Bundesliga'
   AND ms.Saison = 2005
 ORDER BY m.Name;
 
+Abfrage Alle Spiele Bayern München
 
+SELECT 
+    s.MatchID,
+    s.MatchDateTime,
+    s.Ort,
+    ht.Name AS Heimteam,
+    gt.Name AS Gastteam,
+    e.GoalsHeimmannschaft AS Tore_Heim,
+    e.GoalsGastmannschaft AS Tore_Gast
+FROM Spiel s
+JOIN MannschaftSpieltSpiel mss
+    ON s.MatchID = mss.MatchID
+JOIN Mannschaft ht 
+    ON ht.TeamID = mss.Heimannschaft
+JOIN Mannschaft gt 
+    ON gt.TeamID = mss.Gastmannschaft
+JOIN Ergebnis e
+    ON e.MatchID = s.MatchID
+WHERE (mss.Heimannschaft = 40 OR mss.Gastmannschaft = 40)
+  AND e.isHalbzeitErgebnis = 0        -- Nur Endergebnis
+ORDER BY s.MatchDateTime;
 
 

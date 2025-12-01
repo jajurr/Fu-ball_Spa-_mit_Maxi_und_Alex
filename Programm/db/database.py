@@ -33,7 +33,9 @@ def insert_team(team):
             print("Fehler beim Einfügen:", e)
 
 def insert_mannschaft_spielt_in_liga(eintrag):
-    """eintrag = (Saison, LigaName, TeamID)"""
+    """
+    eintrag = (Saison, LigaName, TeamID)
+    """
     with get_connection() as conn:
         try:
             conn.execute("""
@@ -43,3 +45,33 @@ def insert_mannschaft_spielt_in_liga(eintrag):
             conn.commit()
         except sqlite3.Error as e:
             print("Fehler beim Einfügen in MannschaftSpieltInLiga:", e)
+
+def insert_spiel(match_id, date_time, ort):
+    with sqlite3.connect(DB_PATH) as conn:
+        try:
+            conn.execute("""
+                INSERT OR IGNORE INTO Spiel (MatchID, MatchDateTime, Ort)
+                VALUES (?, ?, ?)
+            """, (match_id, date_time, ort))
+        except sqlite3.Error as e:
+            print("Fehler beim Einfügen in Spiel:", e)
+
+def insert_mannschaft_spielt_spiel(match_id, heim, gast):
+    with sqlite3.connect(DB_PATH) as conn:
+        try:
+            conn.execute("""
+                INSERT OR IGNORE INTO MannschaftSpieltSpiel (MatchID, Heimannschaft, Gastmannschaft)
+                VALUES (?, ?, ?)
+            """, (match_id, heim, gast))
+        except sqlite3.Error as e:
+            print("Fehler beim Einfügen in MannschaftSpieltSpiel:", e)
+
+def insert_ergebnis(ergebnis_id, match_id, gast, heim, halbzeit):
+    with sqlite3.connect(DB_PATH) as conn:
+        try:
+            conn.execute("""
+                INSERT OR IGNORE INTO Ergebnis (ErgebnisID, MatchID, GoalsGastmannschaft, GoalsHeimmannschaft, isHalbzeitErgebnis)
+                VALUES (?, ?, ?, ?, ?)
+            """, (ergebnis_id, match_id, gast, heim, halbzeit))
+        except sqlite3.Error as e:
+            print("Fehler beim Einfügen in Ergebnis:", e)        
