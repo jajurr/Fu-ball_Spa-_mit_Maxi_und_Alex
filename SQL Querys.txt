@@ -147,6 +147,69 @@ JOIN Mannschaft mg ON mg.TeamID = mss.Gastmannschaft
 WHERE sst.isOwnGoal = 1
 ORDER BY Tor.MatchID, s.Saison, s.Spieltag, Tor.Spielminute;
 
+--Zweite Bundesliga Tests
+
+--Alle Teams die jemals in der 2. Bundesliga gespielt haben
+SELECT DISTINCT m.Name
+FROM MannschaftSpieltInLiga msl
+JOIN Mannschaft m ON m.TeamID = msl.TeamID
+WHERE msl.LigaName = 'Zweite Bundesliga'
+ORDER BY m.Name;
+
+--Alles Spiele einer Saison der zweiten Liga
+SELECT 
+    s.MatchID,
+    s.Saison,
+    s.Spieltag,
+    mh.Name AS Heimteam,
+    mg.Name AS Gastteam
+FROM Spiel s
+JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
+JOIN Mannschaft mh ON mh.TeamID = mss.Heimannschaft
+JOIN Mannschaft mg ON mg.TeamID = mss.Gastmannschaft
+JOIN MannschaftSpieltInLiga msl 
+    ON msl.TeamID = mh.TeamID AND msl.Saison = s.Saison
+WHERE msl.LigaName = 'Zweite Bundesliga'
+ORDER BY s.Spieltag, s.MatchID;
+
+--Alle Tore der zweiten Bundesliga
+SELECT 
+    Spieler.Name AS Torschütze,
+    s.Saison,
+    s.Spieltag,
+    mh.Name AS Heimteam,
+    mg.Name AS Gastteam,
+    Tor.Spielminute,
+    Tor.MatchID
+FROM Tor
+JOIN Spiel s ON s.MatchID = Tor.MatchID
+JOIN SpielerSchiesstTor sst ON sst.GoalID = Tor.GoalID
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
+JOIN Mannschaft mh ON mh.TeamID = mss.Heimannschaft
+JOIN Mannschaft mg ON mg.TeamID = mss.Gastmannschaft
+JOIN MannschaftSpieltInLiga msl ON msl.TeamID = mh.TeamID AND msl.Saison = s.Saison
+WHERE msl.LigaName = 'Zweite Bundesliga'
+WHERE 
+ORDER BY s.Saison, s.Spieltag, Tor.MatchID, Tor.Spielminute;
+
+--Beste Torschützen in der Zweiten Liga
+SELECT
+    Spieler.Name,
+    COUNT(*) AS Tore
+FROM SpielerSchiesstTor sst
+JOIN Tor ON Tor.GoalID = sst.GoalID
+JOIN Spiel s ON s.MatchID = Tor.MatchID
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+JOIN MannschaftSpieltInLiga msl 
+    ON msl.TeamID = (SELECT TeamID 
+                     FROM SpielerSpieltInMannschaft 
+                     WHERE SpielerID = Spieler.SpielerID AND Saison = s.Saison)
+WHERE sst.isOwnGoal = 0
+  AND msl.LigaName = 'Zweite Bundesliga'
+GROUP BY Spieler.SpielerID
+ORDER BY Tore DESC;
+
 --Alle Daten löschen
 DELETE FROM SpielerSchiesstTor;
 DELETE FROM SpielerSpieltInMannschaft;

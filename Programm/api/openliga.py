@@ -10,23 +10,23 @@ def fetch(endpoint: str):
     with urllib.request.urlopen(url) as res:
         return json.loads(res.read().decode())
 
-def get_bundesliga_matches(season=None):
+def get_liga_matches(league ,season=None):
     """Fetch all match data for first Bundesliga."""
     if season:
-        return fetch(f"/getmatchdata/bl1/{season}")
-    return fetch("/getmatchdata/bl1")
+        return fetch(f"/getmatchdata/{league}]/{season}")
+    return fetch("/getmatchdata/{league}")
 
-def get_bundesliga_teams(season):
+def get_bundesliga_teams(league,season):
     """
     Alle Teams einer Bundesliga-Saison abrufen.
     Gibt leere Liste zurück, wenn die Saison nicht existiert.
     """
     try:
-        return fetch(f"/getavailableteams/bl1/{season}")
+        return fetch(f"/getavailableteams/{league}/{season}")
     except:
         return []  # Saison existiert nicht
 
-def get_historische_saisons(start_year=2001):
+def get_historische_saisons(league,start_year=2001):
     """
     Prüft ab Startjahr bis zur aktuellen Saison,
     welche Saisons tatsächlich Daten liefern
@@ -36,7 +36,7 @@ def get_historische_saisons(start_year=2001):
     vorhandene_saisons = []
 
     for year in range(start_year, current_year + 1):
-        teams = get_bundesliga_teams(year)
+        teams = get_bundesliga_teams(league,year)
         if teams:  # Wenn die API Teams liefert
             vorhandene_saisons.append(year)
 

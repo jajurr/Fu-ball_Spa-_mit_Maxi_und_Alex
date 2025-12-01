@@ -1,21 +1,20 @@
 from api.openliga import get_bundesliga_teams, get_historische_saisons, get_spiele_einer_saison, get_goalgetters, get_einzelspiel
 from db.database import insert_team, insert_mannschaft_spielt_in_liga, insert_spiel, insert_mannschaft_spielt_spiel, insert_ergebnis, insert_spieler, insert_tor, insert_spieler_spielt_in_mannschaft, insert_spieler_schiesst_tor, update_spieler_name
 
-def import_teams_historisch():
+def import_teams_historisch(league, year):
     """Importiert alle Teams ab 2001 in die Mannschaft-Tabelle"""
-    saisons = get_historische_saisons()
+    saisons = get_historische_saisons(league, year)
     for season in saisons:
-        teams = get_bundesliga_teams(season)
+        teams = get_bundesliga_teams(league, season)
         for t in teams:
             team_tuple = (t["teamId"], t["teamName"])
             insert_team(team_tuple)
 
-def import_mannschaft_spielt_in_liga():
+def import_mannschaft_spielt_in_liga(league, liga_name, year):
     """Befüllt die Zwischentabelle: jede Saison einzeln"""
-    liga_name = "Bundesliga"
-    saisons = get_historische_saisons()
+    saisons = get_historische_saisons(league, year)
     for season in saisons:
-        teams = get_bundesliga_teams(season)
+        teams = get_bundesliga_teams(league, season)
         for t in teams:
             eintrag = (
                 season,       # Saison
