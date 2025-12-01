@@ -49,3 +49,9 @@ def get_spiele_einer_saison(liga, saison):
         return fetch(f"/getmatchdata/{liga}/{saison}")
     except:
         return []  # Spiele der Saison existieren nicht
+    
+def get_goalgetters(liga, saison):
+    try:
+        return fetch(f"/getgoalgetters/{liga}/{saison}")
+    except:
+        return []  # Golatgetter existieren nicht

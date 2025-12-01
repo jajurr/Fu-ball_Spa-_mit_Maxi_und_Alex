@@ -1,5 +1,19 @@
-Abfrage Saison 2005
+--Abfrage alle Teams
+SELECT 
+	*
+FROM Mannschaft 
+ORDER BY TeamID;
 
+--Abfrage Mannschaften pro Saison (sollten immer 18 sein)
+SELECT 
+	Saison, 
+	COUNT(*) AS Teams
+FROM MannschaftSpieltInLiga
+GROUP BY Saison
+ORDER BY Saison;
+
+
+--Abfrage Teams Saison 2005
 SELECT 
     m.TeamID,
     m.Name AS Team,
@@ -12,8 +26,7 @@ WHERE ms.LigaName = 'Bundesliga'
   AND ms.Saison = 2005
 ORDER BY m.Name;
 
-Abfrage Alle Spiele Bayern München
-
+--Abfrage Alle Spiele Bayern München
 SELECT 
     s.MatchID,
     s.MatchDateTime,
@@ -35,4 +48,93 @@ WHERE (mss.Heimannschaft = 40 OR mss.Gastmannschaft = 40)
   AND e.isHalbzeitErgebnis = 0        -- Nur Endergebnis
 ORDER BY s.MatchDateTime;
 
+--Abfrage Mannschaften nach MatchID
+SELECT 
+    s.MatchID,
+    s.Saison,
+    s.Spieltag,
+    mh.Name AS Heimteam,
+    mg.Name AS Gastteam
+FROM Spiel s
+JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
+JOIN Mannschaft mh ON mh.TeamID = mss.Heimannschaft
+JOIN Mannschaft mg ON mg.TeamID = mss.Gastmannschaft
+WHERE s.MatchID = 123456;   -- <- MatchID hier eintragen
+
+--Alle Tore mit Spielernamen
+SELECT
+    Tor.GoalID,
+    Tor.MatchID,
+    Tor.Spielminute,
+    Spieler.Name AS Spielername
+FROM Tor
+JOIN SpielerSchiesstTor sst ON sst.GoalID = Tor.GoalID
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+ORDER BY Tor.MatchID, Tor.Spielminute;
+
+--Alle Eigentore
+SELECT 
+    Spieler.Name AS Spieler, 
+    Tor.MatchID, 
+    Tor.Spielminute
+FROM SpielerSchiesstTor sst
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+JOIN Tor ON Tor.GoalID = sst.GoalID
+WHERE sst.isOwnGoal = 1
+ORDER BY Tor.MatchID, Tor.Spielminute;
+
+--Alle Elfmeter-Tore
+SELECT 
+    Spieler.Name AS Spieler,
+    Tor.MatchID,
+    Tor.Spielminute
+FROM SpielerSchiesstTor sst
+JOIN Spieler ON Spieler.SpielerID = sst.SpielerID
+JOIN Tor ON Tor.GoalID = sst.GoalID
+WHERE sst.isPenalty = 1
+ORDER BY Tor.MatchID, Tor.Spielminute;
+
+--Alle Spieler mit Anzahl der Tore
+SELECT 
+    Spieler.Name,
+    COUNT(sst.GoalID) AS Tore
+FROM Spieler
+LEFT JOIN SpielerSchiesstTor sst ON sst.SpielerID = Spieler.SpielerID
+GROUP BY Spieler.SpielerID
+ORDER BY Tore DESC;
+
+--Spiler mit Mannschaften und Saisons
+SELECT 
+    Spieler.Name,
+    ssm.TeamID,
+    m.Name AS Teamname,
+    ssm.Saison
+FROM SpielerSpieltInMannschaft ssm
+JOIN Spieler ON Spieler.SpielerID = ssm.SpielerID
+JOIN Mannschaft m ON m.TeamID = ssm.TeamID
+ORDER BY Spieler.Name, ssm.Saison;
+
+--Fall Granit Xhaka aktuell noch falsche Daten
+SELECT 
+	Spieler.Name, 
+	ssm.TeamID, m.Name AS Teamname, 
+	ssm.Saison 
+FROM SpielerSpieltInMannschaft ssm 
+JOIN Spieler 
+	ON Spieler.SpielerID = ssm.SpielerID 
+JOIN Mannschaft m 
+	ON m.TeamID = ssm.TeamID
+Where Spieler.Name = 'Granit Xhaka'
+ORDER BY Spieler.Name, ssm.Saison;
+
+--Alle Daten löschen
+DELETE FROM SpielerSchiesstTor;
+DELETE FROM SpielerSpieltInMannschaft;
+DELETE FROM Tor;
+DELETE FROM Spieler;
+DELETE FROM Ergebnis;
+DELETE FROM MannschaftSpieltSpiel;
+DELETE FROM Spiel;
+DELETE FROM MannschaftSpieltInLiga;
+DELETE FROM Mannschaft;
 
