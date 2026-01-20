@@ -1,0 +1,7 @@
+streamlit
+pandas
+matplotlib
+
+cd viewer_app
+python -m pip install streamlit pandas matplotlib
+streamlit run app.py
