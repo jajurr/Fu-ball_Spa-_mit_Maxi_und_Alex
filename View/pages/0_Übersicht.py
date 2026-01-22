@@ -2,15 +2,30 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 from db import query_df
-from queries import Q_GOALS_PER_MATCHDAY, Q_KPIS
+from queries import Q_GOALS_PER_MATCHDAY, Q_KPIS, Q_TABLE_STANDINGS
 
 
-st.title("Overview")
-st.write("Saisonübersicht: Kennzahlen und Tore pro Spieltag.")
+
+st.title("Übersicht")
 
 # Sidebar / Filter
 liga = st.selectbox("Liga", ["Bundesliga", "Zweite Bundesliga"])
-saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2022, step=1)
+saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
+
+st.subheader("Tabelle")
+table_df = query_df(Q_TABLE_STANDINGS, (liga, saison, liga, saison))
+
+
+table_df = query_df(Q_TABLE_STANDINGS, (liga, saison, liga, saison))
+if table_df.empty:
+    st.info("Keine Daten gefunden.")
+else:
+    table_display = table_df.copy()
+    table_display.insert(0, "Platz", range(1, len(table_display) + 1))
+    height = min(40 * (len(table_display) + 1), 800)
+    st.dataframe(table_display, use_container_width=True, hide_index=True)
+
+st.divider()
 
 # KPIs laden
 kpis = query_df(Q_KPIS, (liga, saison, liga, saison, liga, saison))
@@ -27,7 +42,7 @@ df = query_df(Q_GOALS_PER_MATCHDAY, (liga, saison))
 
 st.subheader("Tore pro Spieltag")
 if df.empty:
-    st.warning("Keine Daten gefunden. Prüfe Liga/Saison oder ob der Import vollständig ist.")
+    st.warning("Keine Daten gefunden.")
 else:
     st.dataframe(df, use_container_width=True, hide_index=True)
 
@@ -37,3 +52,6 @@ else:
     plt.ylabel("Tore")
     plt.grid(True)
     st.pyplot(fig, clear_figure=True)
+
+
+

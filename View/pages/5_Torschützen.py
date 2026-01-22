@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 from db import query_df
 from queries import Q_TOP_SCORER_SEASON, Q_TOP_SCORER_ALLTIME
 
-st.title("Top Scorer")
-st.write("Top-Torschützen (ohne Eigentore) aus deiner SQLite-Datenbank.")
+st.title("Torschützen")
 
 liga = st.selectbox("Liga", ["Bundesliga", "Zweite Bundesliga"])
 
@@ -15,16 +14,17 @@ mode = st.radio(
     horizontal=True
 )
 
-top_n = st.slider("Wie viele Spieler anzeigen?", min_value=5, max_value=20, value=10, step=1)
 
 if mode == "Eine Saison":
+    top_n = st.slider("Anzahl Spieler", min_value=5, max_value=25, value=10, step=5)
     saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2022, step=1)
     df = query_df(Q_TOP_SCORER_SEASON, (liga, saison, int(top_n)))
 else:
+    top_n = st.slider("Anzahl Spieler", min_value=5, max_value=100, value=20, step=5)
     df = query_df(Q_TOP_SCORER_ALLTIME, (liga, int(top_n)))
 
 if df.empty:
-    st.warning("Keine Daten gefunden. Prüfe, ob Tore/Spieler importiert wurden und ob die LigaName-Werte passen.")
+    st.warning("Keine Daten gefunden.")
     st.stop()
 
 st.subheader("Tabelle")

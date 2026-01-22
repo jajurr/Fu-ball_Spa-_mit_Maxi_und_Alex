@@ -7,10 +7,7 @@ from queries import (
     Q_MATCH_GOALS
 )
 
-st.title("Match Detail")
-st.write("Zeigt Details zu einem Spiel (aus der SQLite-Datenbank).")
-
-# Optional: MatchID aus session_state übernehmen (z.B. aus Teamview)
+st.title("Spiel Details")
 default_match_id = st.session_state.get("selected_match_id", 39738)
 
 match_id = st.number_input(
@@ -23,7 +20,7 @@ match_id = st.number_input(
 header = query_df(Q_MATCH_HEADER, (int(match_id),))
 
 if header.empty:
-    st.error("Kein Spiel mit dieser MatchID gefunden.")
+    st.error(f"Kein Spiel mit der MatchID {match_id} gefunden.")
     st.stop()
 
 h = header.iloc[0]
@@ -67,7 +64,7 @@ st.subheader("Tore")
 goals = query_df(Q_MATCH_GOALS, (int(match_id),))
 
 if goals.empty:
-    st.info("Keine Tore gespeichert (oder keine Spieler-Namen vorhanden).")
+    st.info("Keine Tore gespeichert/keine Spielernamen vorhanden).")
 else:
     # für die Anzeige hübsch machen
     goals_disp = goals.copy()
