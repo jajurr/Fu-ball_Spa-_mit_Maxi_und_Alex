@@ -16,7 +16,7 @@ mode = st.radio(
 
 if mode == "Eine Saison":
     limit = st.slider("Max. Anzahl Zeilen", min_value=5, max_value=50, value=5, step=5)
-    saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2022, step=1)
+    saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
     df = query_df(Q_OWN_GOALS_SEASON, (liga, saison))
 else:
     limit = st.slider("Max. Anzahl Zeilen", min_value=5, max_value=400, value=50, step=5)

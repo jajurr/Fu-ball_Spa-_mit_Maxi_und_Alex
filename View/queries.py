@@ -147,16 +147,45 @@ LIMIT 1;
 
 # Torliste (nur Tore, die einen Spieler haben)
 Q_MATCH_GOALS = """
+WITH MatchInfo AS (
+  SELECT
+    s.MatchID,
+    s.Saison,
+    mss.Heimannschaft AS HeimID,
+    mss.Gastmannschaft AS GastID
+  FROM Spiel s
+  JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
+  WHERE s.MatchID = ?
+)
 SELECT
     COALESCE(t.Spielminute, 999) AS Spielminute,
     p.Name AS Spieler,
     sst.isOwnGoal,
     sst.isPenalty,
     sst.isOvertime,
-    t.GoalID
+    t.GoalID,
+
+    -- Teamzuordnung über SpielerSpieltInMannschaft in dieser Saison:
+    CASE
+      WHEN ssm.TeamID = mi.HeimID THEN 'Heim'
+      WHEN ssm.TeamID = mi.GastID THEN 'Gast'
+      ELSE 'Unbekannt'
+    END AS Seite,
+
+    mt.Name AS SpielerTeam
+
 FROM Tor t
 JOIN SpielerSchiesstTor sst ON sst.GoalID = t.GoalID
 JOIN Spieler p ON p.SpielerID = sst.SpielerID
+JOIN MatchInfo mi ON mi.MatchID = t.MatchID
+
+LEFT JOIN SpielerSpieltInMannschaft ssm
+  ON ssm.Saison = mi.Saison
+ AND ssm.SpielerID = p.SpielerID
+ AND ssm.TeamID IN (mi.HeimID, mi.GastID)
+
+LEFT JOIN Mannschaft mt ON mt.TeamID = ssm.TeamID
+
 WHERE t.MatchID = ?
 ORDER BY COALESCE(t.Spielminute, 999), t.GoalID;
 """

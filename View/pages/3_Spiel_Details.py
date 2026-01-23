@@ -61,14 +61,14 @@ st.divider()
 # Tore
 st.subheader("Tore")
 
-goals = query_df(Q_MATCH_GOALS, (int(match_id),))
+goals = query_df(Q_MATCH_GOALS, (int(match_id), int(match_id)))
 
 if goals.empty:
-    st.info("Keine Tore gespeichert/keine Spielernamen vorhanden).")
+    st.info("Keine Tore gespeichert (oder keine Spieler-Namen vorhanden).")
 else:
-    # für die Anzeige hübsch machen
     goals_disp = goals.copy()
     goals_disp["Minute"] = goals_disp["Spielminute"].apply(lambda x: "—" if x == 999 else int(x))
+    goals_disp["SpielerTeam"] = goals_disp["SpielerTeam"].fillna("Unbekannt")
 
     def flags(row):
         parts = []
@@ -81,6 +81,8 @@ else:
         return ", ".join(parts) if parts else ""
 
     goals_disp["Info"] = goals_disp.apply(flags, axis=1)
-    goals_disp = goals_disp[["Minute", "Spieler", "Info", "GoalID"]]
+
+    # Reihenfolge: Minute, Spieler, Team (Heim/Gast), Flags
+    goals_disp = goals_disp[["Minute", "Spieler", "SpielerTeam", "Seite", "Info", "GoalID"]]
 
     st.dataframe(goals_disp, use_container_width=True, hide_index=True)

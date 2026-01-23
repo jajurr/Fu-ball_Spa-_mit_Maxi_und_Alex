@@ -17,7 +17,7 @@ mode = st.radio(
 
 if mode == "Eine Saison":
     top_n = st.slider("Anzahl Spieler", min_value=5, max_value=25, value=10, step=5)
-    saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2022, step=1)
+    saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
     df = query_df(Q_TOP_SCORER_SEASON, (liga, saison, int(top_n)))
 else:
     top_n = st.slider("Anzahl Spieler", min_value=5, max_value=100, value=20, step=5)
