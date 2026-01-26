@@ -82,9 +82,9 @@ SELECT
     s.Saison,
     s.Spieltag,
     s.MatchID,
-    mh.Name AS Heimteam,
+    mh.Name AS Heimmannschaft,
     mh.TeamLogo AS HeimLogo,
-    mg.Name AS Gastteam,
+    mg.Name AS Gastmannschaft,
     mg.TeamLogo As GastLogo,
     ee.HeimTore,
     ee.GastTore
@@ -110,9 +110,9 @@ SELECT
     s.Spieltag,
     s.MatchDateTime,
     s.Ort,
-    mh.Name AS Heimteam,
+    mh.Name AS Heimmannschaft,
     mh.TeamLogo AS HeimLogo,
-    mg.Name AS Gastteam,
+    mg.Name AS Gastmannschaft,
     mg.TeamLogo AS GastLogo
 FROM Spiel s
 JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
@@ -172,7 +172,7 @@ SELECT
       ELSE 'Unbekannt'
     END AS Seite,
 
-    mt.Name AS SpielerTeam
+    mt.Name AS Mannschaft
 
 FROM Tor t
 JOIN SpielerSchiesstTor sst ON sst.GoalID = t.GoalID
@@ -350,8 +350,8 @@ Games AS (
   SELECT
     s.Saison,
     mss.Heimannschaft AS TeamID,
-    Endstand.HeimTore AS ToreFuer,
-    Endstand.GastTore AS ToreGegen,
+    Endstand.HeimTore AS Tore,
+    Endstand.GastTore AS Gegentore,
     CASE
       WHEN Endstand.HeimTore > Endstand.GastTore THEN 3
       WHEN Endstand.HeimTore = Endstand.GastTore THEN 1
@@ -375,8 +375,8 @@ Games AS (
   SELECT
     s.Saison,
     mss.Gastmannschaft AS TeamID,
-    Endstand.GastTore AS ToreFuer,
-    Endstand.HeimTore AS ToreGegen,
+    Endstand.GastTore AS Tore,
+    Endstand.HeimTore AS Gegentore,
     CASE
       WHEN Endstand.GastTore > Endstand.HeimTore THEN 3
       WHEN Endstand.GastTore = Endstand.HeimTore THEN 1
@@ -397,17 +397,17 @@ Games AS (
 SELECT
   m.Name AS Team,
   SUM(Spiele) AS Spiele,
-  SUM(Siege) AS S,
-  SUM(Unentschieden) AS U,
-  SUM(Niederlagen) AS N,
-  SUM(ToreFuer) AS ToreFuer,
-  SUM(ToreGegen) AS ToreGegen,
-  (SUM(ToreFuer) - SUM(ToreGegen)) AS Diff,
+  SUM(Siege) AS Siege,
+  SUM(Unentschieden) AS Unentschieden,
+  SUM(Niederlagen) AS Niederlagen,
+  SUM(Tore) AS Tore,
+  SUM(Gegentore) AS Gegentore,
+  (SUM(Tore) - SUM(Gegentore)) AS Tordifferenz,
   SUM(Punkte) AS Punkte
 FROM Games g
 JOIN Mannschaft m ON m.TeamID = g.TeamID
 GROUP BY g.TeamID
-ORDER BY Punkte DESC, Diff DESC, ToreFuer DESC, Team ASC;
+ORDER BY Punkte DESC, Tordifferenz DESC, Tore DESC, Team ASC;
 """
 
 
@@ -426,8 +426,8 @@ Games AS (
   SELECT
     s.Saison,
     mss.Heimannschaft AS TeamID,
-    Endstand.HeimTore AS ToreFuer,
-    Endstand.GastTore AS ToreGegen,
+    Endstand.HeimTore AS Tore,
+    Endstand.GastTore AS Gegentore,
     CASE
       WHEN Endstand.HeimTore > Endstand.GastTore THEN 3
       WHEN Endstand.HeimTore = Endstand.GastTore THEN 1
@@ -447,8 +447,8 @@ Games AS (
   SELECT
     s.Saison,
     mss.Gastmannschaft AS TeamID,
-    Endstand.GastTore AS ToreFuer,
-    Endstand.HeimTore AS ToreGegen,
+    Endstand.GastTore AS Tore,
+    Endstand.HeimTore AS Gegentore,
     CASE
       WHEN Endstand.GastTore > Endstand.HeimTore THEN 3
       WHEN Endstand.GastTore = Endstand.HeimTore THEN 1
@@ -467,9 +467,9 @@ TableAgg AS (
     Saison,
     TeamID,
     SUM(Punkte) AS Punkte,
-    SUM(ToreFuer) AS ToreFuer,
-    SUM(ToreGegen) AS ToreGegen,
-    (SUM(ToreFuer) - SUM(ToreGegen)) AS Diff,
+    SUM(Tore) AS Tore,
+    SUM(Gegentore) AS Gegentore,
+    (SUM(Tore) - SUM(Tore)) AS Tordifferenz,
     SUM(Spiele) AS Spiele
   FROM Games
   GROUP BY Saison, TeamID
@@ -486,11 +486,11 @@ Ranked AS (
     t.Saison,
     t.TeamID,
     t.Punkte,
-    t.Diff,
-    t.ToreFuer,
+    t.Tordifferenz,
+    t.Tore,
     ROW_NUMBER() OVER (
       PARTITION BY t.Saison
-      ORDER BY t.Punkte DESC, t.Diff DESC, t.ToreFuer DESC, t.TeamID ASC
+      ORDER BY t.Punkte DESC, t.Tordifferenz DESC, t.Tore DESC, t.TeamID ASC
     ) AS Platz
   FROM TableAgg t
   JOIN CompletedSeasons c ON c.Saison = t.Saison
@@ -499,8 +499,8 @@ SELECT
   r.Saison,
   m.Name AS Meister,
   r.Punkte,
-  r.Diff,
-  r.ToreFuer
+  r.Tordifferenz,
+  r.Tore
 FROM Ranked r
 JOIN Mannschaft m ON m.TeamID = r.TeamID
 WHERE r.Platz = 1

@@ -4,10 +4,7 @@ import matplotlib.pyplot as plt
 from db import query_df
 from queries import Q_GOALS_PER_MATCHDAY, Q_KPIS, Q_TABLE_STANDINGS
 
-
-
 st.title("Übersicht")
-
 # Sidebar
 liga = st.selectbox("Liga", ["Bundesliga", "Zweite Bundesliga"])
 saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
@@ -44,8 +41,10 @@ if df.empty:
     st.warning("Keine Daten gefunden.")
 else:
     st.dataframe(df, use_container_width=True, hide_index=True)
+ 
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(4, 2))
+    plt.tight_layout()
     plt.plot(df["Spieltag"], df["Tore"], marker="o")
     plt.xlabel("Spieltag")
     plt.ylabel("Tore")

@@ -34,7 +34,8 @@ st.subheader("Diagramm")
 # Balkendiagramm
 df_plot = df.iloc[::-1]  # umdrehen, damit Top1 oben steht
 
-fig = plt.figure()
+fig = plt.figure(figsize=(5, 3))
+plt.tight_layout()
 plt.barh(df_plot["Spieler"], df_plot["Tore"])
 plt.xlabel("Tore")
 plt.ylabel("Spieler")

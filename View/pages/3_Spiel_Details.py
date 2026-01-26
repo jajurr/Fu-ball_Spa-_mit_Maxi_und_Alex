@@ -25,7 +25,7 @@ if header.empty:
 
 h = header.iloc[0]
 
-st.subheader(f"{h['Heimteam']} vs. {h['Gastteam']}")
+st.subheader(f"{h['Heimmannschaft']} vs. {h['Gastmannschaft']}")
 
 heim_logo = blob_to_bytes(h["HeimLogo"])
 gast_logo = blob_to_bytes(h["GastLogo"])
@@ -40,7 +40,7 @@ with c_logo_l:
         st.image(heim_logo, width=90)
 
 with c_team_l:
-    st.header(h["Heimteam"])
+    st.header(h["Heimmannschaft"])
 
 with c_mid:
     st.write("")
@@ -49,7 +49,7 @@ with c_mid:
     st.caption(f"Saison {saison_txt} · Spieltag {spieltag_txt}")
 
 with c_team_r:
-    st.header(h["Gastteam"])
+    st.header(h["Gastmannschaft"])
 
 with c_logo_r:
     if gast_logo:
@@ -96,7 +96,7 @@ if goals.empty:
 else:
     goals_disp = goals.copy()
     goals_disp["Minute"] = goals_disp["Spielminute"].apply(lambda x: "—" if x == 999 else int(x))
-    goals_disp["SpielerTeam"] = goals_disp["SpielerTeam"].fillna("Unbekannt")
+    goals_disp["Mannschaft"] = goals_disp["Mannschaft"].fillna("Unbekannt")
 
     def flags(row):
         parts = []
@@ -110,6 +110,6 @@ else:
 
     goals_disp["Info"] = goals_disp.apply(flags, axis=1)
 
-    goals_disp = goals_disp[["Minute", "Spieler", "SpielerTeam", "Seite", "Info", "GoalID"]]
+    goals_disp = goals_disp[["Minute", "Spieler", "Mannschaft", "Seite", "Info", "GoalID"]]
 
     st.dataframe(goals_disp, use_container_width=True, hide_index=True)

@@ -57,7 +57,7 @@ matches_display.loc[
 ] = "—"
 
 # Nur die Spalten anzeigen die auch gebraucht werden
-matches_display = matches_display[["Spieltag", "Heimteam", "Gastteam", "Ergebnis", "MatchID"]]
+matches_display = matches_display[["Spieltag", "Heimmannschaft", "Gastmannschaft", "Ergebnis", "MatchID"]]
 
 st.dataframe(matches_display, use_container_width=True, hide_index=True)
 
