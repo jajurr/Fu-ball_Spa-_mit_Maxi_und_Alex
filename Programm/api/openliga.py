@@ -2,10 +2,13 @@
 import urllib.request
 import json
 
+#URL für openligaDB
 BASE_URL = "https://api.openligadb.de"
 
 def fetch(endpoint: str):
-    """Generic fetch function."""
+    """
+    Generische Fetch
+    """
     url = BASE_URL + endpoint
     with urllib.request.urlopen(url) as res:
         return json.loads(res.read().decode())
@@ -18,8 +21,7 @@ def get_liga_matches(league ,season=None):
 
 def get_bundesliga_teams(league,season):
     """
-    Alle Teams einer Bundesliga-Saison abrufen.
-    Gibt leere Liste zurück, wenn die Saison nicht existiert.
+    Alle Teams einer Sasion - leer wenn es keine Saison gibt
     """
     try:
         return fetch(f"/getavailableteams/{league}/{season}")
@@ -28,8 +30,7 @@ def get_bundesliga_teams(league,season):
 
 def get_historische_saisons(league,start_year=2001):
     """
-    Prüft ab Startjahr bis zur aktuellen Saison,
-    welche Saisons tatsächlich Daten liefern
+    Holt alle Saisons ab 2001
     """
     from datetime import datetime
     current_year = datetime.now().year
@@ -43,19 +44,27 @@ def get_historische_saisons(league,start_year=2001):
     return vorhandene_saisons
 
 def get_spiele_einer_saison(liga, saison):
-    """Gibt alle Spiele einer bestimmten Saison zurück."""
+    """
+    Gibt alle Spiele für eine Liga/Saison
+    """
     try:
         return fetch(f"/getmatchdata/{liga}/{saison}")
     except:
         return []  # Spiele der Saison existieren nicht
     
 def get_goalgetters(liga, saison):
+    """
+    Gibt alle Toschützen für eine Liga/Saison
+    """
     try:
         return fetch(f"/getgoalgetters/{liga}/{saison}")
     except:
         return []  # Golatgetter existieren nicht
     
 def get_einzelspiel(matchID):
+    """
+    Gibt die Daten eines einzelnes Spieles per MatchID zurück
+    """
     try:
         return fetch(f"/getmatchdata/{matchID}")
     except:

@@ -12,8 +12,6 @@ mode = st.radio(
     horizontal=True
 )
 
-
-
 if mode == "Eine Saison":
     limit = st.slider("Max. Anzahl Zeilen", min_value=5, max_value=50, value=5, step=5)
     saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
@@ -33,13 +31,9 @@ st.metric(
     value=total_own_goals
 )
 
-st.metric("Anzahl Eigentore", len(df))
-
-# Minute hübsch: NULL -> —
 df_disp = df.copy()
 df_disp["Spielminute"] = df_disp["Spielminute"].apply(lambda x: "—" if x is None else int(x))
 
-# ggf. limit anwenden
 df_disp = df_disp.head(int(limit))
 
 st.dataframe(df_disp, use_container_width=True, hide_index=True)
@@ -50,7 +44,6 @@ top_df = None
 if mode == "Eine Saison":
     pass
 else:
-    #Tabelle
     st.subheader("Die meisten Eigentore nach Spieler für alle Saisons")
     top_n = st.slider("Anzahl Spieler", min_value=5, max_value=50, value=10, step=5)       
     top_df = query_df(Q_TOP_OWN_GOAL_SCORERS_ALLTIME, (liga, int(top_n)))

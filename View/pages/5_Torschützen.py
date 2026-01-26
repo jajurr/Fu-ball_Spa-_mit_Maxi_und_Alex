@@ -14,7 +14,6 @@ mode = st.radio(
     horizontal=True
 )
 
-
 if mode == "Eine Saison":
     top_n = st.slider("Anzahl Spieler", min_value=5, max_value=25, value=10, step=5)
     saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
@@ -32,7 +31,7 @@ st.dataframe(df, use_container_width=True, hide_index=True)
 
 st.subheader("Diagramm")
 
-# Balkendiagramm (oben: höchster Wert)
+# Balkendiagramm
 df_plot = df.iloc[::-1]  # umdrehen, damit Top1 oben steht
 
 fig = plt.figure()

@@ -5,31 +5,27 @@ from typing import Iterable, Any, Optional
 import pandas as pd
 import streamlit as st
 
-
-# Passe das an, falls deine DB woanders liegt:
+# Pfad zu SQLite:
 DEFAULT_DB_PATH = Path("C:\\Users\\Arjurr\\Desktop\\Uni\\IuK2\\Sqlite\\Fussball.db")
-
 
 @st.cache_resource
 def get_connection(db_path: str) -> sqlite3.Connection:
     """
-    Erstellt eine SQLite-Verbindung (wird von Streamlit gecacht).
+    Verbindung zu SQLite
     """
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
-
 def get_db_path() -> str:
     """
-    Ermittelt den DB-Pfad. Du kannst den Pfad auch über die Sidebar setzen.
+    Gibt den Pfad zur SQLite Datenbank zurück
     """
     return str(DEFAULT_DB_PATH)
 
-
 def query_df(sql: str, params: Optional[Iterable[Any]] = None, db_path: Optional[str] = None) -> pd.DataFrame:
     """
-    Führt eine SELECT-Abfrage aus und gibt ein DataFrame zurück.
+    Führt eine SELECT-Abfrage aus und gibt ein DataFrame zurück
     """
     if params is None:
         params = ()
@@ -39,10 +35,9 @@ def query_df(sql: str, params: Optional[Iterable[Any]] = None, db_path: Optional
     conn = get_connection(db_path)
     return pd.read_sql_query(sql, conn, params=params)
 
-
 def query_value(sql: str, params: Optional[Iterable[Any]] = None, db_path: Optional[str] = None):
     """
-    Liefert einen einzelnen Wert (z.B. COUNT(*)).
+    Abfrage für einen Wert
     """
     if params is None:
         params = ()
@@ -55,6 +50,9 @@ def query_value(sql: str, params: Optional[Iterable[Any]] = None, db_path: Optio
     return row[0] if row else None
 
 def blob_to_bytes(value):
+    """
+    Macht aus einem Blob in der DB bytes
+    """
     if value is None:
         return None
     if isinstance(value, memoryview):

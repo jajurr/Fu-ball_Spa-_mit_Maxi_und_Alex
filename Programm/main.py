@@ -11,15 +11,15 @@ def main():
 
     #import_mannschaft_spielt_in_liga('bl2', 'Zweite Bundesliga', 2006)
 
-    aktuelles_jahr = datetime.now().year
+    #aktuelles_jahr = datetime.now().year
 
     #print(f"Importiere Spiele der Bundesliga von 2001 bis {aktuelles_jahr}...")
 
-    for saison in range(2024, aktuelles_jahr + 1):
-        
-        import_spiele_saison("bl1", saison)
-        import_goalgetters_saison("bl1", saison)
-        print(f"Saison {saison} importiert")
+    #for saison in range(2024, aktuelles_jahr + 1):
+    #    
+    #    import_spiele_saison("bl1", saison)
+    #    import_goalgetters_saison("bl1", saison)
+    #    print(f"Saison {saison} importiert")
     print("Fertig!")
     #spiele = get_spiele_einer_saison("bl1", 2010)
     #print(spiele[0]["goals"])

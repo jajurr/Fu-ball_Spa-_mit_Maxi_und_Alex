@@ -1,12 +1,9 @@
-# Hier sammeln wir nach und nach alle SQL-Abfragen zentral.
-# Das macht die Views sauber und gut wartbar.
-
-Q_DB_HEALTHCHECK = "SELECT 1 AS ok;"
+# Sammlunng aller SQL Queries
 
 Q_DB_HEALTHCHECK = "SELECT 1 AS ok;"
 
 # Tore pro Spieltag für eine Liga + Saison
-# Wir nutzen msl + Heimteam-Verknüpfung, um das Spiel eindeutig einer Liga zuzuordnen.
+# MannschaftSpieltSpiel + Heimteim um eine Zuordnung zur Liga zu haben
 Q_GOALS_PER_MATCHDAY = """
 SELECT
     s.Spieltag,
@@ -22,8 +19,7 @@ WHERE msl.LigaName = ?
 GROUP BY s.Spieltag
 ORDER BY s.Spieltag;
 """
-
-# Kleine Kennzahlen (Spiele, Tore, Eigentore) für Liga + Saison
+# Holt Kennzahlen (Spiele, Tore, Eigentore) für eine Liga + Saison
 Q_KPIS = """
 SELECT
     (SELECT COUNT(*)
@@ -137,7 +133,7 @@ ORDER BY e.ErgebnisID DESC
 LIMIT 1;
 """
 
-# Halbzeit (isHalbzeitErgebnis=1)
+# Halbzeitergebnis (isHalbzeitErgebnis=1)
 Q_MATCH_HALFTIME = """
 SELECT
     e.GoalsHeimmannschaft AS HeimTore,
@@ -149,7 +145,7 @@ ORDER BY e.ErgebnisID DESC
 LIMIT 1;
 """
 
-# Torliste
+# Torliste für ein Match
 Q_MATCH_GOALS = """
 WITH MatchInfo AS (
   SELECT
@@ -193,7 +189,7 @@ LEFT JOIN Mannschaft mt ON mt.TeamID = ssm.TeamID
 WHERE t.MatchID = ?
 ORDER BY COALESCE(t.Spielminute, 999), t.GoalID;
 """
-
+# Top Scorer für eine Liga + Saison
 Q_TOP_SCORER_SEASON = """
 SELECT
     p.Name AS Spieler,
@@ -216,7 +212,7 @@ ORDER BY Tore DESC
 LIMIT ?;
 """
 
-# Top Scorer über alle Saisons für eine Liga (ohne Eigentore)
+# Top Scorer über alle Saisons für eine Liga
 Q_TOP_SCORER_ALLTIME = """
 SELECT
     p.Name AS Spieler,
@@ -339,7 +335,7 @@ LIMIT ?;
 """
 
 # Tabelle/Standings aus der DB (Liga + Saison)
-# Nutzt Endergebnis (isHalbzeitErgebnis=0). Zählt nur Spiele, für die ein Endergebnis existiert.
+# Nutzt Endergebnis (isHalbzeitErgebnis=0)
 Q_TABLE_STANDINGS = """
 WITH Endstand AS (
   SELECT
@@ -415,7 +411,7 @@ ORDER BY Punkte DESC, Diff DESC, ToreFuer DESC, Team ASC;
 """
 
 
-# Meister pro Saison (für eine Liga) - aus DB berechnet
+# Meister pro Saison + Liga
 Q_CHAMPIONS_BY_SEASON = """
 WITH Endstand AS (
   SELECT

@@ -1,6 +1,6 @@
 import sqlite3
 
-#Pfad zur Datenbank, ggf. tauschen
+#Pfad zur Datenbank
 DB_PATH = "C:\\Users\\Arjurr\\Desktop\\Uni\\IuK2\\Sqlite\\Fussball.db"
 
 def get_connection():
@@ -8,6 +8,9 @@ def get_connection():
     return sqlite3.connect(DB_PATH)
 
 def test_conenction():
+    """
+    Verbindungstest
+    """
     with get_connection() as conn:
         try:
             cur = conn.cursor()
@@ -76,7 +79,6 @@ def insert_ergebnis(ergebnis_id, match_id, gast, heim, halbzeit):
         except sqlite3.Error as e:
             print("Fehler beim Einfügen in Ergebnis:", e)        
 
-
 def insert_tor(goal_id, minute, match_id):
     with get_connection() as conn:
         try:
@@ -124,7 +126,6 @@ def insert_spieler_spielt_in_mannschaft(spieler_id, team_id, saison):
             """, (saison, team_id, spieler_id))
         except sqlite3.Error as e:
             print("Fehler beim Einfügen in spieler_spielt_in_mannschaft:", e)   
-
 
 def update_spieler_name(spieler_id, name):
     with get_connection() as conn:

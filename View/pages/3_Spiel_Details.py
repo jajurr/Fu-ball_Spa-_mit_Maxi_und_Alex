@@ -33,7 +33,6 @@ gast_logo = blob_to_bytes(h["GastLogo"])
 saison_txt = int(h["Saison"]) if h["Saison"] is not None else "—"
 spieltag_txt = int(h["Spieltag"]) if h["Spieltag"] is not None else "—"
 
-# 5 Spalten für saubere Ausrichtung
 c_logo_l, c_team_l, c_mid, c_team_r, c_logo_r = st.columns([1, 3, 2, 3, 1])
 
 with c_logo_l:
@@ -44,7 +43,6 @@ with c_team_l:
     st.header(h["Heimteam"])
 
 with c_mid:
-    # 👇 Vertikaler Spacer
     st.write("")
     st.write("")
     st.subheader("VS")
@@ -66,7 +64,6 @@ right.metric("Ort", h["Ort"] if h["Ort"] else "—")
 if h["MatchDateTime"]:
     st.caption(f"Anstoß: {h['MatchDateTime']}")
 
-# Ergebnisse
 endres = query_df(Q_MATCH_ENDRESULT, (int(match_id),))
 half = query_df(Q_MATCH_HALFTIME, (int(match_id),))
 
@@ -90,7 +87,6 @@ with col2:
 
 st.divider()
 
-# Tore
 st.subheader("Tore")
 
 goals = query_df(Q_MATCH_GOALS, (int(match_id), int(match_id)))
@@ -114,7 +110,6 @@ else:
 
     goals_disp["Info"] = goals_disp.apply(flags, axis=1)
 
-    # Reihenfolge: Minute, Spieler, Team (Heim/Gast), Flags
     goals_disp = goals_disp[["Minute", "Spieler", "SpielerTeam", "Seite", "Info", "GoalID"]]
 
     st.dataframe(goals_disp, use_container_width=True, hide_index=True)

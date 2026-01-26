@@ -8,7 +8,7 @@ from queries import Q_GOALS_PER_MATCHDAY, Q_KPIS, Q_TABLE_STANDINGS
 
 st.title("Übersicht")
 
-# Sidebar / Filter
+# Sidebar
 liga = st.selectbox("Liga", ["Bundesliga", "Zweite Bundesliga"])
 saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, step=1)
 
@@ -27,7 +27,6 @@ else:
 
 st.divider()
 
-# KPIs laden
 kpis = query_df(Q_KPIS, (liga, saison, liga, saison, liga, saison))
 
 col1, col2, col3 = st.columns(3)

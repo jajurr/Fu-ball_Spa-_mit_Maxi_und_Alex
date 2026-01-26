@@ -21,13 +21,13 @@ st.divider()
 
 st.subheader("Häufigste Meister")
 counts = df["Meister"].value_counts().reset_index()
-counts.columns = ["Team", "Titel"]
+counts.columns = ["Mannschaft", "Meisterschaften"]
 
 st.dataframe(counts, use_container_width=True, hide_index=True)
 
 fig = plt.figure()
-plt.barh(counts["Team"][::-1], counts["Titel"][::-1])
-plt.xlabel("Titel")
+plt.barh(counts["Mannschaft"][::-1], counts["Meisterschaften"][::-1])
+plt.xlabel("Meisterschaften")
 plt.ylabel("Team")
 plt.grid(True)
 st.pyplot(fig, clear_figure=True)

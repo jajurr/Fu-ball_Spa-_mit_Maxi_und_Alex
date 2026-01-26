@@ -13,7 +13,7 @@ saison = st.number_input("Saison", min_value=2001, max_value=2030, value=2025, s
 teams = query_df(Q_TEAMS_IN_LEAGUE_SEASON, (liga, saison))
 
 if teams.empty:
-    st.warning("Keine Teams gefunden.")
+    st.warning("Keine Mannschaft gefunden.")
     st.stop()
 
 team_name = st.selectbox("Team", teams["Name"].tolist())
@@ -56,14 +56,14 @@ matches_display.loc[
     "Ergebnis"
 ] = "—"
 
-# Nur die Spalten anzeigen, die Nutzer wirklich brauchen
+# Nur die Spalten anzeigen die auch gebraucht werden
 matches_display = matches_display[["Spieltag", "Heimteam", "Gastteam", "Ergebnis", "MatchID"]]
 
 st.dataframe(matches_display, use_container_width=True, hide_index=True)
 
 st.divider()
 
-# Optional: MatchID direkt "übernehmen" für Match-Detail-View
+# Übernahme der MatchID
 st.subheader("MatchID auswählen (für Spiel Details)")
 match_id = st.selectbox("MatchID", matches_display["MatchID"].tolist())
 st.session_state["selected_match_id"] = int(match_id)
