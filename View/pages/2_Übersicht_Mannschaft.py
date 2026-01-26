@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd 
-from db import query_df
+from db import query_df, blob_to_bytes
 from queries import Q_TEAMS_IN_LEAGUE_SEASON, Q_MATCHES_OF_TEAM_SEASON
 
 
@@ -18,6 +18,16 @@ if teams.empty:
 
 team_name = st.selectbox("Team", teams["Name"].tolist())
 team_id = int(teams.loc[teams["Name"] == team_name, "TeamID"].iloc[0])
+
+team_row = teams.loc[teams["TeamID"] == team_id].iloc[0]
+logo_bytes = blob_to_bytes(team_row["TeamLogo"])
+
+c1, c2 = st.columns([1, 4])
+with c1:
+    if logo_bytes:
+        st.image(logo_bytes, width=80)
+with c2:
+    st.markdown(f"## {team_row['Name']}")
 
 matches = query_df(Q_MATCHES_OF_TEAM_SEASON, (liga, saison, team_id, team_id))
 

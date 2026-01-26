@@ -1,5 +1,5 @@
 import streamlit as st
-from db import query_df
+from db import query_df, blob_to_bytes
 from queries import (
     Q_MATCH_HEADER,
     Q_MATCH_ENDRESULT,
@@ -26,6 +26,38 @@ if header.empty:
 h = header.iloc[0]
 
 st.subheader(f"{h['Heimteam']} vs. {h['Gastteam']}")
+
+heim_logo = blob_to_bytes(h["HeimLogo"])
+gast_logo = blob_to_bytes(h["GastLogo"])
+
+saison_txt = int(h["Saison"]) if h["Saison"] is not None else "—"
+spieltag_txt = int(h["Spieltag"]) if h["Spieltag"] is not None else "—"
+
+# 5 Spalten für saubere Ausrichtung
+c_logo_l, c_team_l, c_mid, c_team_r, c_logo_r = st.columns([1, 3, 2, 3, 1])
+
+with c_logo_l:
+    if heim_logo:
+        st.image(heim_logo, width=90)
+
+with c_team_l:
+    st.header(h["Heimteam"])
+
+with c_mid:
+    # 👇 Vertikaler Spacer
+    st.write("")
+    st.write("")
+    st.subheader("VS")
+    st.caption(f"Saison {saison_txt} · Spieltag {spieltag_txt}")
+
+with c_team_r:
+    st.header(h["Gastteam"])
+
+with c_logo_r:
+    if gast_logo:
+        st.image(gast_logo, width=90)
+
+
 left, mid, right = st.columns(3)
 left.metric("Saison", int(h["Saison"]) if h["Saison"] is not None else "—")
 mid.metric("Spieltag", int(h["Spieltag"]) if h["Spieltag"] is not None else "—")

@@ -53,3 +53,10 @@ def query_value(sql: str, params: Optional[Iterable[Any]] = None, db_path: Optio
     cur = conn.execute(sql, params)
     row = cur.fetchone()
     return row[0] if row else None
+
+def blob_to_bytes(value):
+    if value is None:
+        return None
+    if isinstance(value, memoryview):
+        return value.tobytes()
+    return value

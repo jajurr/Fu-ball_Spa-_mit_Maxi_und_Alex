@@ -60,7 +60,7 @@ SELECT
 
 # Alle Teams einer Liga in einer Saison
 Q_TEAMS_IN_LEAGUE_SEASON = """
-SELECT m.TeamID, m.Name
+SELECT m.TeamID, m.Name, m.TeamLogo
 FROM MannschaftSpieltInLiga msl
 JOIN Mannschaft m ON m.TeamID = msl.TeamID
 WHERE msl.LigaName = ?
@@ -87,7 +87,9 @@ SELECT
     s.Spieltag,
     s.MatchID,
     mh.Name AS Heimteam,
+    mh.TeamLogo AS HeimLogo,
     mg.Name AS Gastteam,
+    mg.TeamLogo As GastLogo,
     ee.HeimTore,
     ee.GastTore
 FROM Spiel s
@@ -113,7 +115,9 @@ SELECT
     s.MatchDateTime,
     s.Ort,
     mh.Name AS Heimteam,
-    mg.Name AS Gastteam
+    mh.TeamLogo AS HeimLogo,
+    mg.Name AS Gastteam,
+    mg.TeamLogo AS GastLogo
 FROM Spiel s
 JOIN MannschaftSpieltSpiel mss ON mss.MatchID = s.MatchID
 JOIN Mannschaft mh ON mh.TeamID = mss.Heimannschaft
@@ -145,7 +149,7 @@ ORDER BY e.ErgebnisID DESC
 LIMIT 1;
 """
 
-# Torliste (nur Tore, die einen Spieler haben)
+# Torliste
 Q_MATCH_GOALS = """
 WITH MatchInfo AS (
   SELECT
